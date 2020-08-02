@@ -250,7 +250,7 @@ async function addTagsToPost(postId, tagList) {
 //         const { rows: [author] } = await client.query(`
 //         SELECT id, username, name, location
 //         FROM users
-//         WHERE id = $1;
+//         WHERE id = $1; //This line is what seems to break this due to the spaces around "="
 //         `, [post.authorId]);
 
 //         post.tags = tags;
@@ -272,6 +272,13 @@ async function getPostById(postId) {
         FROM posts
         WHERE id=$1;
       `, [postId]);
+
+        if (!post) {
+            throw {
+                name: "PostNotFoundError",
+                message: "Could not find a post with that postId"
+            };
+        }
 
         const { rows: tags } = await client.query(`
         SELECT tags.*
@@ -349,5 +356,6 @@ module.exports = {
     addTagsToPost,
     getPostsByTagName,
     getAllTags,
-    getUserByUsername
+    getUserByUsername,
+    getPostById
 }
